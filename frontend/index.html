@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- displays site properly based on user's device -->
+
+    <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon-32x32.png">
+    <link rel="stylesheet" href="style.css">
+
+    <title>Frontend Mentor | QR code component</title>
+
+    <!-- Feel free to remove these styles or customise in your own stylesheet 👍 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .attribution {
+            font-size: 11px;
+            text-align: center;
+        }
+
+        .attribution a {
+            color: hsl(228, 45%, 44%);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <form id="qr-form">
+            <label for="qr-input">Enter text for QR code:</label>
+            <input type="text" id="qr-input" name="qr-input" placeholder="Type here..." />
+            <button type="submit">get</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <div class="header" class="result">
+            <img src="images/my-portfolio.png" alt="qr-code">
+        </div>
+        <div class="container">
+            <h3>Generate Your Custom QR Code Instantly</h3>
+            <p>Enter any text above to create your own QR code. Download the image and share it anywhere you like!</p>
+        </div>
+    </div>
+</body>
+
+</html>
+<script>
+    document.querySelector('form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const text = document.getElementById('qr-input').value;
+        console.log(text);
+
+        const res = await fetch('http://localhost:5000/generate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ text })
+        });
+
+        const cards = document.querySelectorAll(".card");
+        cards.forEach(card => {
+            card.style.backgroundColor = "black";
+            card.style.color = "white";
+        });
+
+
+        const data = await res.json();
+
+        // Replace existing QR code image
+        const img = document.querySelector('.header img');
+        img.src = data.qrCode;
+
+
+        // Create download link
+        const downloadLink = document.createElement('a');
+        downloadLink.href = data.qrCode;
+        downloadLink.download = 'qr-code.png';
+        downloadLink.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+  <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+  <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+</svg>`;
+
+        // Optionally add classes or styles
+        downloadLink.style.display = 'inline-block';
+        downloadLink.style.marginTop = '10px';
+
+        const container = document.querySelector('.container');
+
+        // Remove any old download link
+        const oldLink = container.querySelector('a');
+        if (oldLink) oldLink.remove();
+
+        container.appendChild(downloadLink);
+    });
+</script>

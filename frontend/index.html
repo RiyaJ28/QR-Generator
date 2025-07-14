@@ -55,7 +55,7 @@
         const text = document.getElementById('qr-input').value;
         console.log(text);
 
-        const res = await fetch('http://localhost:5000/generate', {
+        const res = await fetch('https://qr-generator-b7gn.onrender.com/generate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
